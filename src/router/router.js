@@ -6,42 +6,9 @@ export default new Router({
   routes: [
     {
       path: '/',
+      redirect: '/indexesMaintain',
       name: 'home',
-      component: () => import('@/views/Home.vue'),
-      children: [
-        {
-          path: '/indexesMaintain',
-          name: 'indexesMaintain',
-          component: () => import('@/views/indexesMaintain'),
-          meta: {
-            menu: '指标维护'
-          }
-        },
-        {
-          path: '/indexMaintain',
-          name: 'indexMaintain',
-          component: () => import('@/views/indexesMaintain'),
-          meta: {
-            menu: '评估执行'
-          }
-        },
-        {
-          path: '/indexMaintain',
-          name: 'indexMaintain',
-          component: () => import('@/views/indexesMaintain'),
-          meta: {
-            menu: '查询统计'
-          }
-        },
-        {
-          path: '/indexMaintain',
-          name: 'indexMaintain',
-          component: () => import('@/views/indexesMaintain'),
-          meta: {
-            menu: '评估查询'
-          }
-        }
-      ]
+      component: () => import('@/views/Home.vue')
     }
     // { //history模式下，404页面
     //   path: '*',

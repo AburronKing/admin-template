@@ -2,76 +2,89 @@
   <div class="menu">
     <div v-if="!isCollapse" class="bg-menu_close" @click="isCollapse=true"></div>
     <div v-if="isCollapse" class="bg-menu_open" @click="isCollapse=false"></div>
+    <div class="slogan">
+      <div class="bg-menu_logo"></div>
+      <span v-if="!isCollapse">这里是系统名称</span>
+    </div>
+    <div class="xn-menu">
+      <el-menu
+        :default-active="activeIndex"
+        class="el-menu-reset"
+        text-color="#fff"
+        active-text-color="#59C4FD"
+        :unique-opened="true"
+        :collapse="isCollapse"
+        @select="selectMenu"
+      >
+        <div v-for="item in routers" :key="item.path">
+          <el-submenu v-if="item.children" :index="item.index">
+            <template slot="title">
+              <i v-if="item.icon" :class="{[item.icon]: true}"></i>
+              <span slot="title">{{ item.name }}</span>
+            </template>
+            <div v-for="item2 in item.children" :key="item2.path">
+              <el-submenu v-if="item2.children" :index="item2.index">
+                <template slot="title">
+                  <span slot="title">{{ item2.name }}</span>
+                </template>
+                <el-menu-item v-for="item3 in item2.children" :key="item3.path" :index="item3.index">
+                  <span slot="title">{{ item3.name }}</span>
+                </el-menu-item>
+              </el-submenu>
+              <el-menu-item v-else :index="item2.index">
+                <span slot="title">{{ item2.name }}</span>
+              </el-menu-item>
+            </div>
+          </el-submenu>
+          <el-menu-item v-else :index="item.index">
+            <i v-if="item.icon" :class="{[item.icon]: true}"></i>
+            <span slot="title">{{ item.name }}</span>
+          </el-menu-item>
+        </div>
+      </el-menu>
+    </div>
     
-    <el-menu
-      default-active="1"
-      class="xn-menu"
-      text-color="#fff"
-      active-text-color="#59C4FD"
-      :collapse="isCollapse"
-      @open="handleOpen"
-      @close="handleClose"
-    >
-      <div class="slogan">
-        <div class="bg-menu_logo"></div>
-        <span>效能评价子系统</span>
-      </div>
-      <el-menu-item index="1">
-        <i class="bg-menu_icon_zbwh"></i>
-        <span slot="title">指标维护</span>
-      </el-menu-item>
-      <el-menu-item index="2">
-        <i class="bg-menu_icon_pgzx"></i>
-        <span slot="title">评估执行</span>
-      </el-menu-item>
-      <el-submenu index="3">
-        <template slot="title">
-          <i class="bg-menu_icon_cxtj"></i>
-          <span>查询统计</span>
-        </template>
-        <el-menu-item index="3-1">指标模板查询</el-menu-item>
-        <el-menu-item index="3-2">评估任务查询</el-menu-item>
-      </el-submenu>
-      <el-submenu index="4">
-        <template slot="title">
-          <i class="bg-menu_icon_pgcx"></i>
-          <span>评估查询</span>
-        </template>
-        <el-menu-item index="4-1">采集公司评估</el-menu-item>
-        <el-submenu index="4-2">
-          <template slot="title">
-            <i class="bg-menu_icon_cxtj"></i>
-            <span>坐席人员评估</span>
-          </template>
-          <el-menu-item index="4-2-1">坐席人员评估表</el-menu-item>
-          <el-menu-item index="4-2-2">坐席评估汇总表</el-menu-item>
-        </el-submenu>
-      </el-submenu>
-      <el-submenu index="5">
-        <template slot="title">
-          <i class="bg-menu_icon_cxtj"></i>
-          <span>报表查询</span>
-        </template>
-        <el-menu-item index="5-1">指标模板查询</el-menu-item>
-        <el-menu-item index="5-2">评估任务查询</el-menu-item>
-      </el-submenu>
-    </el-menu>
   </div>
 </template>
 
 <script>
+import { menu } from '@/main.js';
 export default {
   data() {
     return {
-      isCollapse: false
+      isCollapse: false,
+      routers: [],
+      activeIndex: 1
     };
   },
+  created() {
+    this.routers = menu;
+    this.activeIndex = this.$route.meta.index;
+  },
   methods: {
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath);
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath);
+    selectMenu(key, keyPath) {
+      const len = keyPath.length;
+      let path = '';
+      for (const i of this.routers) {
+        if (i.index === keyPath[0]) {
+          path = i.path;
+          if (len > 1) {
+            const secondMenu = i.children.find(item => item.index === keyPath[1]);
+            path = secondMenu.path;
+            if (len > 2) {
+              for (const j of secondMenu.children) {
+                if (j.index === keyPath[2]) {
+                  path = j.path;
+                }
+                
+              }
+            }
+          }
+        }
+      }
+      this.$router.push({
+        path: path
+      });
     }
   }
 };
@@ -99,14 +112,11 @@ export default {
 </style>
 
 <style lang="scss">
-.el-menu {
-  width: 248px;
+.menu {
   height: 100%;
   background: url('~@/assets/img/menu-bg.png');
-  background-color: transparent;
   background-position: left bottom;
   .slogan {
-    width: 248px;
     height: 68px;
     color: #fff;
     font-size: 16px;
@@ -118,6 +128,22 @@ export default {
       vertical-align: middle;
       margin: 0 10px 0 21px;
     }
+  }
+  .xn-menu {
+    height: calc(100% - 68px);
+    padding-bottom: 30px;
+    overflow: hidden;
+  }
+  .el-menu-reset {
+    width: 263px;
+    height: 100%;
+    border-right: none;
+    margin-right: -15px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .el-menu {
+    background-color: transparent;
   }
   i {
     display: inline-block;
@@ -151,29 +177,58 @@ export default {
   }
   .el-menu-item {
     width: 248px;
-    padding-left: 30px !important;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 26px !important;
   }
-  .el-submenu__title {
-    padding-left: 30px !important;
-  }
-  &.el-menu--collapse {
-    width: 60px;
-    .el-menu-item {
-      width: 60px;
-      padding-left: 20px !important;
-    }
+  
+  .el-submenu {
     .el-submenu__title {
-      padding-left: 20px !important;
-    }
-    .slogan {
-      width: 60px;
-      .bg-menu_logo {
-        margin-left: 16px;
-      }
-      span {
-        display: none;
+      height: 40px;
+      line-height: 40px;
+      padding-left: 26px !important;
+      i {
+        color: #fff;
       }
     }
+    .el-menu-item {
+      padding: 0 20px 0 65px !important;
+      height: 44px;
+      line-height: 44px;
+    }
+    .el-submenu__icon-arrow {
+      left: 220px;
+      right: unset;
+    }
+  }
+  .el-menu--collapse {
+    margin-right: 0;
+    width: 64px;
+  }
+  .el-menu--collapse .el-menu-item .el-submenu__icon-arrow, .el-menu--collapse .el-submenu>.el-submenu__title .el-submenu__icon-arrow, .el-menu--collapse .el-menu-item span, .el-menu--collapse .el-submenu>.el-submenu__title span {
+    display: none;
+  }
+}
+.el-submenu .el-submenu {
+  .el-submenu__title {
+    padding: 0 10px 0 65px !important;
+  }
+  .el-menu-item {
+    padding: 0 10px 0 85px !important;
+  }
+}
+
+.el-tooltip {
+  padding-left: 26px !important;
+}
+.el-menu--popup {
+  background: url('~@/assets/img/menu-bg.png');
+  .el-menu-item:hover, .el-submenu .el-submenu__title:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  .el-menu-item, .el-submenu__title {
+    height: 42px;
+    line-height: 42px;
   }
 }
 </style>

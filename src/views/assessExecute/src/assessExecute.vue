@@ -1,12 +1,12 @@
 <template>
-  <!-- 指标维护 -->
-  <div class="indexesMaintain">
-    指标维护
+  <!-- 评估执行 -->
+  <div class="assessExecute">
+    评估执行
   </div>
 </template>
 <script>
 export default {
-  name: 'indexesMaintain',
+  name: 'assessExecute',
   props: {
 
   },

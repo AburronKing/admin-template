@@ -1,18 +1,31 @@
 <template>
   <!-- 导航栏 -->
   <div class="nav-bar">
-    <el-breadcrumb separator="/">
-      <el-breadcrumb-item>首页</el-breadcrumb-item>
-      <el-breadcrumb-item>活动管理</el-breadcrumb-item>
-      <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-      <el-breadcrumb-item>活动详情</el-breadcrumb-item>
-    </el-breadcrumb>
+    {{ breadcrumb }}
     <div class="user">
       <div class="bg-avatar"></div>
-      欢迎，摆摊人
+      欢迎，admin
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      breadcrumb: ''
+    };
+  },
+  watch: {
+    '$route'(n) {
+      this.breadcrumb = n.meta.breadcrumb;
+    }
+  },
+  created() {
+    this.breadcrumb = this.$route.meta.breadcrumb;
+  }
+};
+</script>
 
 <style lang="scss">
 .nav-bar {

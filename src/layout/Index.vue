@@ -3,7 +3,7 @@
   <div class="main-contain">
     <nav-bar></nav-bar>
     <div class="contain">
-
+      <router-view></router-view>
     </div>
   </div>
 </template>
