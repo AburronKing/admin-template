@@ -6,14 +6,15 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/indexesMaintain',
+      redirect: '/calendarForElement',
       name: 'home',
-      component: () => import('@/views/Home.vue')
+      component: () => import('@/views/Home.vue'),
+      children: []
+    },
+    { //history模式下，404页面
+      path: '*',
+      component: () => import("@/views/404"),
+      hidden: true
     }
-    // { //history模式下，404页面
-    //   path: '*',
-    //   component: () => import("@/views/404.vue"),
-    //   hidden: true
-    // }
   ]
 });

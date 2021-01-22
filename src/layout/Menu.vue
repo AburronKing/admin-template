@@ -4,7 +4,7 @@
     <div v-if="isCollapse" class="bg-menu_open" @click="isCollapse=false"></div>
     <div class="slogan">
       <div class="bg-menu_logo"></div>
-      <span v-if="!isCollapse">这里是系统名称</span>
+      <span v-if="!isCollapse">组件Factory</span>
     </div>
     <div class="xn-menu">
       <el-menu
@@ -16,27 +16,28 @@
         :collapse="isCollapse"
         @select="selectMenu"
       >
-        <div v-for="item in routers" :key="item.path">
-          <el-submenu v-if="item.children" :index="item.index">
+        <div v-for="item in routes" :key="item.path">
+          <!-- 有子级 -->
+          <el-submenu v-if="item.children" :index="item.id">
             <template slot="title">
               <i v-if="item.icon" :class="{[item.icon]: true}"></i>
               <span slot="title">{{ item.name }}</span>
             </template>
             <div v-for="item2 in item.children" :key="item2.path">
-              <el-submenu v-if="item2.children" :index="item2.index">
+              <el-submenu v-if="item2.children" :index="item2.id">
                 <template slot="title">
                   <span slot="title">{{ item2.name }}</span>
                 </template>
-                <el-menu-item v-for="item3 in item2.children" :key="item3.path" :index="item3.index">
+                <el-menu-item v-for="item3 in item2.children" :key="item3.path" :index="item3.id">
                   <span slot="title">{{ item3.name }}</span>
                 </el-menu-item>
               </el-submenu>
-              <el-menu-item v-else :index="item2.index">
+              <el-menu-item v-else :index="item2.id">
                 <span slot="title">{{ item2.name }}</span>
               </el-menu-item>
             </div>
           </el-submenu>
-          <el-menu-item v-else :index="item.index">
+          <el-menu-item v-else :index="item.id">
             <i v-if="item.icon" :class="{[item.icon]: true}"></i>
             <span slot="title">{{ item.name }}</span>
           </el-menu-item>
@@ -48,43 +49,42 @@
 </template>
 
 <script>
-import { menu } from '@/main.js';
+import { actRoute } from '@/router/actRoute.js';
 export default {
   data() {
     return {
       isCollapse: false,
-      routers: [],
-      activeIndex: 1
+      activeIndex: 1,
+      routes: actRoute
     };
   },
   created() {
-    this.routers = menu;
-    this.activeIndex = this.$route.meta.index;
+    this.activeIndex = this.$route.meta.id;
   },
   methods: {
     selectMenu(key, keyPath) {
-      const len = keyPath.length;
-      let path = '';
-      for (const i of this.routers) {
-        if (i.index === keyPath[0]) {
-          path = i.path;
-          if (len > 1) {
-            const secondMenu = i.children.find(item => item.index === keyPath[1]);
-            path = secondMenu.path;
-            if (len > 2) {
-              for (const j of secondMenu.children) {
-                if (j.index === keyPath[2]) {
-                  path = j.path;
-                }
-                
-              }
+      let path = this.findPath(key, this.routes);
+      this.$router.push({
+        path: path || '*'
+      });
+    },
+    // 查找路径
+    findPath(id, routes) {
+      try {
+        var filterRoute = routes.find(item => item.id === id)
+        if(filterRoute) {
+          return filterRoute.path
+        } else { // 如果没有对应id  则去找它子级的path
+          for(let i of routes) {
+            if(i.children && i.children.length) {
+               return this.findPath(id, i.children);
             }
           }
         }
+      } catch (err) {
+        console.log(err);
+        return '*'
       }
-      this.$router.push({
-        path: path
-      });
     }
   }
 };

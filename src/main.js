@@ -2,47 +2,17 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router/router';
 import '@/assets/css/index.scss';
-import { Button, Menu, Submenu, MenuItem, MenuItemGroup, Select, Table, TableColumn, Breadcrumb,
-  BreadcrumbItem } from 'element-ui';
+import { actRoute } from '@/router/actRoute.js';
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 
 Vue.config.productionTip = false;
 
-Vue.use(Button);
-Vue.use(Select);
-Vue.use(Menu);
-Vue.use(Submenu);
-Vue.use(MenuItem);
-Vue.use(MenuItemGroup);
-Vue.use(Table);
-Vue.use(TableColumn);
-Vue.use(Breadcrumb);
-Vue.use(BreadcrumbItem);
-
-// 路由配置
-export const menu = [
-  {
-    path: '/indexesMaintain',
-    name: '指标维护',
-    breadcrumb: '指标维护',
-    index: '1',
-    icon: 'bg-menu_icon_zbwh'
-  },
-  {
-    path: '/assessExecute',
-    name: '评估执行',
-    breadcrumb: '评估执行',
-    index: '2',
-    icon: 'bg-menu_icon_pgzx'
-  }
-];
+Vue.use(ElementUI);
 
 const toRoute = function(menu) {
-  const route = {
-    path: '/',
-    component: () => import('@/views/Home.vue'),
-    name: 'home',
-    children: []
-  };
+  // 主路由 '/'  子路由寄存处
+  const route = router.options.routes[0];
   route.children = setMenu(menu);
   return route;
 };
@@ -50,7 +20,7 @@ const toRoute = function(menu) {
 let routes = []
 const setMenu = function(menu) {
   for (const i of menu) {
-    if (i.children) {
+    if (i.children && i.children.length) {
       setMenu(i.children)
     } else {
       const item = {
@@ -58,8 +28,8 @@ const setMenu = function(menu) {
         name: i.path.split('/').splice(-1,1)[0],
         component: () => import(`@/views${i.path}/index.js`),
         meta: {
-          breadcrumb: i.breadcrumb,
-          index: i.index
+          breadcrumb: i.name,
+          id: i.id
         }
       }
       routes.push(item)
@@ -67,10 +37,10 @@ const setMenu = function(menu) {
   }
   return routes;
 };
-
-const actRoute = toRoute(menu);
+// 生成路由
+const generateRoute = toRoute(actRoute);
 //动态添加路由
-router.addRoutes([actRoute]);
+router.addRoutes([generateRoute]);
 
 new Vue({
   router,

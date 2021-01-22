@@ -28,6 +28,8 @@ export default {
     width: 100%;
     height: calc(100% - 48px);
     border-radius: 4px;
+    padding: 12px;
+    overflow: auto;
   }
 }
 </style>
